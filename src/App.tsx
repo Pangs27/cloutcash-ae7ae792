@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import DashboardPage from "./pages/DashboardPage";
+import MatchPage from "./pages/MatchPage";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
@@ -25,6 +26,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <DashboardPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/match" 
+            element={
+              <ProtectedRoute>
+                <MatchPage />
               </ProtectedRoute>
             } 
           />
