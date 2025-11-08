@@ -1,10 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Check, Target, BarChart, Users } from "lucide-react";
-import { useState } from "react";
-import { SignupModal } from "./SignupModal";
+import { useNavigate } from "react-router-dom";
 
 export const ForBrands = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
   const benefits = [
     "Access 10,000+ verified micro-influencers",
     "Target specific niches with precision matching",
@@ -86,7 +85,7 @@ export const ForBrands = () => {
               variant="hero" 
               size="lg" 
               className="text-lg px-10 py-6 h-auto group"
-              onClick={() => setIsModalOpen(true)}
+              onClick={() => navigate("/login")}
             >
               Launch Your Campaign
               <BarChart className="ml-2 h-5 w-5 group-hover:scale-110 transition-transform" />
@@ -94,8 +93,6 @@ export const ForBrands = () => {
           </div>
         </div>
       </div>
-
-      <SignupModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} defaultType="brand" />
     </section>
   );
 };

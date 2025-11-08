@@ -1,10 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Check, Sparkles, DollarSign, Calendar } from "lucide-react";
-import { useState } from "react";
-import { SignupModal } from "./SignupModal";
+import { useNavigate } from "react-router-dom";
 
 export const ForInfluencers = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
   const benefits = [
     "Access 500+ verified brand campaigns monthly",
     "Transparent budget ranges from ₹5K to ₹50K+ per campaign",
@@ -46,7 +45,7 @@ export const ForInfluencers = () => {
               variant="hero" 
               size="lg" 
               className="text-lg px-10 py-6 h-auto group"
-              onClick={() => setIsModalOpen(true)}
+              onClick={() => navigate("/login")}
             >
               Start Earning Today
               <Sparkles className="ml-2 h-5 w-5 group-hover:rotate-12 transition-transform" />
@@ -82,8 +81,6 @@ export const ForInfluencers = () => {
           </div>
         </div>
       </div>
-
-      <SignupModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} defaultType="creator" />
     </section>
   );
 };

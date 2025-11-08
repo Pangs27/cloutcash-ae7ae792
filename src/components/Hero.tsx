@@ -1,25 +1,10 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Users, TrendingUp } from "lucide-react";
-import { useState, useEffect } from "react";
+import { ArrowRight, TrendingUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import logo from "@/assets/cloutcash-logo.png";
-import { SignupModal } from "./SignupModal";
-import { ThemeToggle } from "./ThemeToggle";
-import { useAuth } from "@/hooks/useAuth";
 
 export const Hero = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<"creator" | "brand">("creator");
   const navigate = useNavigate();
-
-  const openModal = (type: "creator" | "brand") => {
-    setModalType(type);
-    setIsModalOpen(true);
-  };
-
-  const handleSignupSuccess = () => {
-    navigate("/dashboard");
-  };
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-background via-background to-muted">
@@ -43,7 +28,7 @@ export const Hero = () => {
               variant="hero" 
               size="lg" 
               className="text-lg px-10 py-6 h-auto group"
-              onClick={() => openModal("creator")}
+              onClick={() => navigate("/login")}
             >
               Start Matching
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
@@ -52,7 +37,7 @@ export const Hero = () => {
               variant="outline-hero" 
               size="lg" 
               className="text-lg px-10 py-6 h-auto"
-              onClick={() => openModal("brand")}
+              onClick={() => navigate("/login")}
             >
               Learn More
               <TrendingUp className="ml-2 h-5 w-5" />
@@ -71,13 +56,6 @@ export const Hero = () => {
         <div className="absolute top-20 left-10 w-72 h-72 bg-primary rounded-full blur-3xl animate-float"></div>
         <div className="absolute bottom-20 right-10 w-96 h-96 bg-accent rounded-full blur-3xl animate-float" style={{ animationDelay: "1.5s" }}></div>
       </div>
-
-      <SignupModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-        defaultType={modalType}
-        onSuccess={handleSignupSuccess}
-      />
     </section>
   );
 };

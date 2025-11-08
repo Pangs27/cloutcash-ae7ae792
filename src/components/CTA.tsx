@@ -1,10 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
-import { useState } from "react";
-import { SignupModal } from "./SignupModal";
+import { useNavigate } from "react-router-dom";
 
 export const CTA = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <section className="py-20 bg-gradient-to-br from-primary via-accent to-primary relative overflow-hidden">
@@ -23,7 +22,7 @@ export const CTA = () => {
               variant="secondary" 
               size="lg" 
               className="text-lg px-10 py-6 h-auto bg-white text-primary hover:bg-white/90 hover:scale-105 transition-transform group"
-              onClick={() => setIsModalOpen(true)}
+              onClick={() => navigate("/login")}
             >
               Start Matching
               <ArrowRight className="ml-2 h-5 w-5 group-hover:translate-x-1 transition-transform" />
@@ -47,8 +46,6 @@ export const CTA = () => {
         <div className="absolute top-10 left-10 w-64 h-64 bg-white rounded-full blur-3xl animate-float"></div>
         <div className="absolute bottom-10 right-10 w-80 h-80 bg-white rounded-full blur-3xl animate-float" style={{ animationDelay: "1.5s" }}></div>
       </div>
-
-      <SignupModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </section>
   );
 };
