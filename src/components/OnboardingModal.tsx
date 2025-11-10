@@ -6,8 +6,9 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { motion, AnimatePresence } from "framer-motion";
-import { Sparkles, Target, Upload, Check } from "lucide-react";
+import { Sparkles, Target, Upload, Check, Info } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { computeProfileCompletion } from "@/lib/profileCompletion";
@@ -223,9 +224,19 @@ export function OnboardingModal({ isOpen, onComplete, userType, userId }: Onboar
                   <div className="flex items-center gap-2 text-primary">
                     <Sparkles className="h-5 w-5" />
                     <h3 className="text-xl font-semibold">Choose Your Niches</h3>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs">
+                          <p>Our AI uses your niches to find {userType === "creator" ? "brands" : "influencers"} in similar spaces, ensuring relevant partnerships and higher match quality.</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    Select at least 2 areas you're interested in (helps us find better matches)
+                    Select at least 2 areas you're interested in. The more specific you are, the better we can match you with relevant {userType === "creator" ? "brands" : "creators"}.
                   </p>
                   
                   <div className="grid grid-cols-2 gap-3 pt-2">
@@ -271,11 +282,21 @@ export function OnboardingModal({ isOpen, onComplete, userType, userId }: Onboar
                     <h3 className="text-xl font-semibold">
                       Add Your {userType === "creator" ? "Profile Photo" : "Brand Logo"}
                     </h3>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs">
+                          <p>Profiles with photos get 4x more matches! A professional {userType === "creator" ? "photo" : "logo"} builds trust and makes your profile stand out.</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </div>
                   <p className="text-sm text-muted-foreground">
                     {userType === "creator" 
-                      ? "Upload a photo that represents you professionally"
-                      : "Upload your brand logo or representative image"}
+                      ? "A professional photo helps brands recognize and remember you. Profiles with photos receive significantly more connection requests."
+                      : "Your brand logo is the first thing creators see. A clear, professional image establishes credibility and increases match rates."}
                   </p>
                   
                   <div className="space-y-4 pt-2">
@@ -329,9 +350,19 @@ export function OnboardingModal({ isOpen, onComplete, userType, userId }: Onboar
                   <div className="flex items-center gap-2 text-primary">
                     <Target className="h-5 w-5" />
                     <h3 className="text-xl font-semibold">Set Your First Goal</h3>
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Info className="h-4 w-4 text-muted-foreground cursor-help" />
+                        </TooltipTrigger>
+                        <TooltipContent className="max-w-xs">
+                          <p>We use your goal to prioritize matches, customize your dashboard, and suggest relevant opportunities aligned with your objectives.</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
                   </div>
                   <p className="text-sm text-muted-foreground">
-                    What brings you to CloutCash? This helps us personalize your experience.
+                    Your goal helps us customize your feed and prioritize {userType === "creator" ? "brands" : "creators"} that align with what you're trying to achieve.
                   </p>
                   
                   <div className="space-y-3 pt-2">
