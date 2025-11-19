@@ -85,6 +85,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onHomeClick, onContactClick, onA
                   Discover
                 </Button>
                 <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate("/messages")}
+                >
+                  <User className="h-4 w-4 mr-2" />
+                  Messages
+                </Button>
+                <Button
                   variant="outline"
                   size="sm"
                   onClick={handleLogout}

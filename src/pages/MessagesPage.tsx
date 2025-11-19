@@ -1,0 +1,370 @@
+import { useState, useEffect, useRef } from "react";
+import { Navbar } from "@/components/Navbar";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Search, Send } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { toast } from "@/hooks/use-toast";
+import { formatDistanceToNow } from "date-fns";
+
+interface Profile {
+  id: string;
+  full_name: string;
+  avatar_url: string | null;
+  user_type: string;
+}
+
+interface Conversation {
+  id: string;
+  creator_id: string;
+  brand_id: string;
+  last_message_at: string;
+  creator_profile?: Profile;
+  brand_profile?: Profile;
+  last_message?: {
+    content: string;
+    created_at: string;
+  };
+}
+
+interface Message {
+  id: string;
+  conversation_id: string;
+  sender_id: string;
+  content: string;
+  created_at: string;
+  read: boolean;
+}
+
+const MessagesPage = () => {
+  const { user } = useAuth();
+  const [conversations, setConversations] = useState<Conversation[]>([]);
+  const [activeConversation, setActiveConversation] = useState<Conversation | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [newMessage, setNewMessage] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [currentProfile, setCurrentProfile] = useState<Profile | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  useEffect(() => {
+    const fetchCurrentProfile = async () => {
+      if (!user) return;
+      const { data } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("user_id", user.id)
+        .single();
+      if (data) setCurrentProfile(data);
+    };
+    fetchCurrentProfile();
+  }, [user]);
+
+  useEffect(() => {
+    const fetchConversations = async () => {
+      if (!currentProfile) return;
+
+      const { data, error } = await supabase
+        .from("conversations")
+        .select(`
+          *,
+          creator_profile:profiles!conversations_creator_id_fkey(*),
+          brand_profile:profiles!conversations_brand_id_fkey(*)
+        `)
+        .or(`creator_id.eq.${currentProfile.id},brand_id.eq.${currentProfile.id}`)
+        .order("last_message_at", { ascending: false });
+
+      if (error) {
+        console.error("Error fetching conversations:", error);
+        return;
+      }
+
+      // Fetch last message for each conversation
+      const conversationsWithMessages = await Promise.all(
+        (data || []).map(async (conv) => {
+          const { data: lastMsg } = await supabase
+            .from("messages")
+            .select("content, created_at")
+            .eq("conversation_id", conv.id)
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .single();
+
+          return {
+            ...conv,
+            last_message: lastMsg || undefined,
+          };
+        })
+      );
+
+      setConversations(conversationsWithMessages);
+    };
+
+    fetchConversations();
+    const interval = setInterval(fetchConversations, 3000);
+
+    return () => clearInterval(interval);
+  }, [currentProfile]);
+
+  useEffect(() => {
+    if (!activeConversation) return;
+
+    const fetchMessages = async () => {
+      const { data, error } = await supabase
+        .from("messages")
+        .select("*")
+        .eq("conversation_id", activeConversation.id)
+        .order("created_at", { ascending: true });
+
+      if (error) {
+        console.error("Error fetching messages:", error);
+        return;
+      }
+
+      setMessages(data || []);
+    };
+
+    fetchMessages();
+
+    // Set up realtime subscription
+    const channel = supabase
+      .channel(`messages:${activeConversation.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+          filter: `conversation_id=eq.${activeConversation.id}`,
+        },
+        (payload) => {
+          setMessages((prev) => [...prev, payload.new as Message]);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [activeConversation]);
+
+  const handleSendMessage = async () => {
+    if (!newMessage.trim() || !activeConversation || !currentProfile) return;
+
+    const { error } = await supabase.from("messages").insert({
+      conversation_id: activeConversation.id,
+      sender_id: currentProfile.id,
+      content: newMessage.trim(),
+    });
+
+    if (error) {
+      toast({
+        title: "Error",
+        description: "Failed to send message",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Update last_message_at
+    await supabase
+      .from("conversations")
+      .update({ last_message_at: new Date().toISOString() })
+      .eq("id", activeConversation.id);
+
+    setNewMessage("");
+  };
+
+  const getOtherProfile = (conv: Conversation): Profile | undefined => {
+    if (!currentProfile) return undefined;
+    return conv.creator_id === currentProfile.id
+      ? conv.brand_profile
+      : conv.creator_profile;
+  };
+
+  const filteredConversations = conversations.filter((conv) => {
+    const otherProfile = getOtherProfile(conv);
+    return otherProfile?.full_name.toLowerCase().includes(searchQuery.toLowerCase());
+  });
+
+  return (
+    <div className="min-h-screen bg-background">
+      <Navbar
+        onHomeClick={() => {}}
+        onContactClick={() => {}}
+        onAboutClick={() => {}}
+      />
+      <div className="container mx-auto px-4 py-8">
+        <div className="flex gap-6 h-[calc(100vh-12rem)]">
+          {/* Left Sidebar - Conversation List */}
+          <div className="w-80 border-r border-border flex flex-col">
+            <div className="p-4 border-b border-border">
+              <h2 className="text-2xl font-bold mb-4">Messages</h2>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search messages..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-9"
+                />
+              </div>
+            </div>
+            <ScrollArea className="flex-1">
+              {filteredConversations.length === 0 ? (
+                <div className="p-8 text-center text-muted-foreground">
+                  No conversations yet. Start swiping to match!
+                </div>
+              ) : (
+                filteredConversations.map((conv) => {
+                  const otherProfile = getOtherProfile(conv);
+                  if (!otherProfile) return null;
+
+                  const isActive = activeConversation?.id === conv.id;
+
+                  return (
+                    <div
+                      key={conv.id}
+                      onClick={() => setActiveConversation(conv)}
+                      className={`p-4 border-b border-border cursor-pointer transition-colors hover:bg-muted/50 ${
+                        isActive ? "bg-muted" : ""
+                      }`}
+                    >
+                      <div className="flex gap-3">
+                        <Avatar>
+                          <AvatarImage src={otherProfile.avatar_url || ""} />
+                          <AvatarFallback>
+                            {otherProfile.full_name[0]?.toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex justify-between items-start mb-1">
+                            <h3 className="font-semibold truncate">
+                              {otherProfile.full_name}
+                            </h3>
+                            {conv.last_message && (
+                              <span className="text-xs text-muted-foreground">
+                                {formatDistanceToNow(new Date(conv.last_message.created_at), {
+                                  addSuffix: true,
+                                })}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-sm text-muted-foreground truncate">
+                            {conv.last_message?.content || "No messages yet"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </ScrollArea>
+          </div>
+
+          {/* Right Side - Chat Window */}
+          <div className="flex-1 flex flex-col">
+            {activeConversation ? (
+              <>
+                {/* Chat Header */}
+                <div className="p-4 border-b border-border">
+                  <div className="flex items-center gap-3">
+                    <Avatar>
+                      <AvatarImage
+                        src={getOtherProfile(activeConversation)?.avatar_url || ""}
+                      />
+                      <AvatarFallback>
+                        {getOtherProfile(activeConversation)?.full_name[0]?.toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <h3 className="font-semibold">
+                        {getOtherProfile(activeConversation)?.full_name}
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        {getOtherProfile(activeConversation)?.user_type}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Messages Area */}
+                <ScrollArea className="flex-1 p-4">
+                  <div className="space-y-4">
+                    {messages.map((msg) => {
+                      const isMine = msg.sender_id === currentProfile?.id;
+                      return (
+                        <div
+                          key={msg.id}
+                          className={`flex ${isMine ? "justify-end" : "justify-start"}`}
+                        >
+                          <div
+                            className={`max-w-[70%] rounded-lg px-4 py-2 ${
+                              isMine
+                                ? "bg-primary text-primary-foreground"
+                                : "bg-muted"
+                            }`}
+                          >
+                            <p className="text-sm">{msg.content}</p>
+                            <span className="text-xs opacity-70 mt-1 block">
+                              {new Date(msg.created_at).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    <div ref={messagesEndRef} />
+                  </div>
+                </ScrollArea>
+
+                {/* Message Input */}
+                <div className="p-4 border-t border-border">
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Type a message..."
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && !e.shiftKey) {
+                          e.preventDefault();
+                          handleSendMessage();
+                        }
+                      }}
+                      className="flex-1"
+                    />
+                    <Button
+                      onClick={handleSendMessage}
+                      disabled={!newMessage.trim()}
+                      size="icon"
+                    >
+                      <Send className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="flex-1 flex items-center justify-center text-muted-foreground">
+                Select a conversation to start messaging
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default MessagesPage;

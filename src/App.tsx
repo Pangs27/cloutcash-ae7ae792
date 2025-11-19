@@ -12,6 +12,7 @@ import ProfilePage from "./pages/ProfilePage";
 import ProfileSetupPage from "./pages/ProfileSetupPage";
 import SwipePage from "./pages/SwipePage";
 import DiscoverPage from "./pages/DiscoverPage";
+import MessagesPage from "./pages/MessagesPage";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
@@ -79,6 +80,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <DiscoverPage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/messages" 
+            element={
+              <ProtectedRoute>
+                <MessagesPage />
               </ProtectedRoute>
             } 
           />
