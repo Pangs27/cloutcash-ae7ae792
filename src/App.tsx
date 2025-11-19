@@ -10,6 +10,7 @@ import MatchPage from "./pages/MatchPage";
 import MatchesPage from "./pages/MatchesPage";
 import ProfilePage from "./pages/ProfilePage";
 import SwipePage from "./pages/SwipePage";
+import DiscoverPage from "./pages/DiscoverPage";
 import NotFound from "./pages/NotFound";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 
@@ -61,6 +62,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <SwipePage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/discover" 
+            element={
+              <ProtectedRoute>
+                <DiscoverPage />
               </ProtectedRoute>
             } 
           />

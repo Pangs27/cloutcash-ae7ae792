@@ -66,7 +66,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onHomeClick, onContactClick, onA
           {/* Right-side controls */}
           <div className="flex items-center space-x-4">
             <ThemeToggle />
-            {user ? (
+          {user ? (
               <div className="flex items-center space-x-2">
                 <Button
                   variant="ghost"
@@ -75,6 +75,14 @@ export const Navbar: React.FC<NavbarProps> = ({ onHomeClick, onContactClick, onA
                 >
                   <User className="h-4 w-4 mr-2" />
                   Dashboard
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate("/discover")}
+                >
+                  <User className="h-4 w-4 mr-2" />
+                  Discover
                 </Button>
                 <Button
                   variant="outline"
