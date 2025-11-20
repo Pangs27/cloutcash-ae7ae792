@@ -65,6 +65,7 @@ export type Database = {
           created_at: string
           creator_id: string
           id: string
+          last_message: string | null
           last_message_at: string | null
           match_id: string | null
           updated_at: string
@@ -74,6 +75,7 @@ export type Database = {
           created_at?: string
           creator_id: string
           id?: string
+          last_message?: string | null
           last_message_at?: string | null
           match_id?: string | null
           updated_at?: string
@@ -83,6 +85,7 @@ export type Database = {
           created_at?: string
           creator_id?: string
           id?: string
+          last_message?: string | null
           last_message_at?: string | null
           match_id?: string | null
           updated_at?: string
@@ -155,7 +158,7 @@ export type Database = {
           conversation_id: string
           created_at: string
           id: string
-          read: boolean
+          read_at: string | null
           sender_id: string
         }
         Insert: {
@@ -163,7 +166,7 @@ export type Database = {
           conversation_id: string
           created_at?: string
           id?: string
-          read?: boolean
+          read_at?: string | null
           sender_id: string
         }
         Update: {
@@ -171,7 +174,7 @@ export type Database = {
           conversation_id?: string
           created_at?: string
           id?: string
-          read?: boolean
+          read_at?: string | null
           sender_id?: string
         }
         Relationships: [
