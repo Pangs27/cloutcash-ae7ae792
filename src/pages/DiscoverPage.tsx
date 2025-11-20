@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, useMotionValue, useTransform, PanInfo, AnimatePresence } from 'framer-motion';
-import { X, Star, Heart, MapPin, DollarSign, TrendingUp, Users, Loader2 } from 'lucide-react';
+import { X, Star, Heart, MapPin, DollarSign, TrendingUp, Users, Loader2, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -14,6 +15,7 @@ import { Influencer } from '@/types/matchmaking';
 import { toast } from '@/hooks/use-toast';
 
 export default function DiscoverPage() {
+  const navigate = useNavigate();
   const { candidates, loading, fetchMore, hasMore, updateFilters, refetch } = useMatchFeed('brand');
   const { recordFeedback } = useFeedback();
   const [swipedCardIds, setSwipedCardIds] = useState<Set<string>>(new Set());

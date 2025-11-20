@@ -1,7 +1,8 @@
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
-import { Heart, MessageCircle, Bookmark, BookmarkCheck } from "lucide-react";
+import { Heart, MessageCircle, Bookmark, BookmarkCheck, Eye } from "lucide-react";
 import { useState } from "react";
 
 interface MatchCardProps {
@@ -32,6 +33,7 @@ export const MatchCard = ({
   isSaved,
   isCreator,
 }: MatchCardProps) => {
+  const navigate = useNavigate();
   const [isRequestSent, setIsRequestSent] = useState(false);
 
   const handleSendRequest = () => {
@@ -102,6 +104,13 @@ export const MatchCard = ({
           ) : (
             <Bookmark className="h-4 w-4" />
           )}
+        </Button>
+        <Button 
+          size="sm" 
+          variant="outline"
+          onClick={() => navigate(`/profile/${matchProfile.id}`)}
+        >
+          <Eye className="h-4 w-4" />
         </Button>
       </div>
     </Card>
