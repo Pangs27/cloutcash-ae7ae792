@@ -1,9 +1,10 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Sparkles, MapPin, Users, DollarSign, Lock } from 'lucide-react';
+import { Sparkles, MapPin, Users, DollarSign, Eye } from 'lucide-react';
 import { mockInfluencers, mockBrandCampaigns } from '@/lib/mockData';
 import { MatchModal } from '@/components/MatchModal';
 import { toast } from '@/hooks/use-toast';
@@ -13,6 +14,7 @@ interface RecommendedMatchesProps {
 }
 
 export function RecommendedMatches({ userType }: RecommendedMatchesProps) {
+  const navigate = useNavigate();
   const [matchModalOpen, setMatchModalOpen] = useState(false);
   const [selectedMatch, setSelectedMatch] = useState<any>(null);
 
@@ -23,19 +25,12 @@ export function RecommendedMatches({ userType }: RecommendedMatchesProps) {
 
   const handleConnect = (match: any) => {
     setSelectedMatch({
+      id: match.id,
       name: userType === 'creator' ? match.brandName : match.name,
       avatar: userType === 'creator' ? match.logo : match.avatar,
       niche: userType === 'creator' ? match.categories[0] : match.niches[0],
     });
     setMatchModalOpen(true);
-  };
-
-  const handleViewProfile = () => {
-    toast({
-      title: '🔒 Premium Feature',
-      description: 'Full profile viewing is available in the Premium Plan. Upgrade to see detailed profiles.',
-      duration: 4000,
-    });
   };
 
   const container = {
@@ -124,13 +119,13 @@ export function RecommendedMatches({ userType }: RecommendedMatchesProps) {
                         Connect
                       </Button>
                       <Button 
-                        onClick={handleViewProfile}
+                        onClick={() => navigate(`/profile/${match.id}`)}
                         variant="outline"
                         size="sm"
-                        className="flex-1"
+                        className="gap-1"
                       >
-                        <Lock className="h-3 w-3 mr-1" />
-                        View Profile
+                        <Eye className="h-3 w-3" />
+                        View
                       </Button>
                     </div>
                   </CardContent>

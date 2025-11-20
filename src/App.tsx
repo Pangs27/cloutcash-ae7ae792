@@ -9,6 +9,7 @@ import DashboardPage from "./pages/DashboardPage";
 import MatchPage from "./pages/MatchPage";
 import MatchesPage from "./pages/MatchesPage";
 import ProfilePage from "./pages/ProfilePage";
+import UserProfilePage from "./pages/UserProfilePage";
 import ProfileSetupPage from "./pages/ProfileSetupPage";
 import SwipePage from "./pages/SwipePage";
 import DiscoverPage from "./pages/DiscoverPage";
@@ -56,6 +57,14 @@ const App = () => (
             element={
               <ProtectedRoute>
                 <ProfilePage />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/profile/:id" 
+            element={
+              <ProtectedRoute>
+                <UserProfilePage />
               </ProtectedRoute>
             } 
           />

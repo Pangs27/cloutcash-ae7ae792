@@ -1,6 +1,7 @@
+import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Heart, Lock } from 'lucide-react';
+import { Heart, Lock, Eye } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
 
@@ -8,6 +9,7 @@ interface MatchModalProps {
   isOpen: boolean;
   onClose: () => void;
   matchProfile: {
+    id?: string;
     name: string;
     avatar: string;
     niche: string;
@@ -15,6 +17,8 @@ interface MatchModalProps {
 }
 
 export function MatchModal({ isOpen, onClose, matchProfile }: MatchModalProps) {
+  const navigate = useNavigate();
+  
   const showPremiumToast = () => {
     toast({
       title: '🔒 Premium Feature',
@@ -65,6 +69,20 @@ export function MatchModal({ isOpen, onClose, matchProfile }: MatchModalProps) {
                 Premium
               </Badge>
             </Button>
+            
+            {matchProfile.id && (
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  navigate(`/profile/${matchProfile.id}`);
+                  onClose();
+                }}
+                className="w-full gap-2"
+              >
+                <Eye className="w-4 h-4" />
+                View Profile
+              </Button>
+            )}
             
             <Button 
               variant="outline" 

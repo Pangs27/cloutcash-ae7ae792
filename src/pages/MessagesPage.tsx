@@ -1,11 +1,12 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
-import { Search, Send } from "lucide-react";
+import { Search, Send, Eye } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
@@ -192,6 +193,7 @@ const MOCK_MESSAGES: Message[] = [
 ];
 
 const MessagesPage = () => {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const [conversations, setConversations] = useState<Conversation[]>(MOCK_CONVERSATIONS);
   const [activeConversation, setActiveConversation] = useState<Conversation | null>(MOCK_CONVERSATIONS[0]);
@@ -478,7 +480,7 @@ const MessagesPage = () => {
                         isActive ? "bg-muted" : ""
                       }`}
                     >
-                      <div className="flex gap-3">
+                      <div className="flex gap-3 items-start">
                         <Avatar>
                           <AvatarImage src={otherProfile.avatar_url || ""} />
                           <AvatarFallback>
@@ -509,6 +511,16 @@ const MessagesPage = () => {
                             {conv.last_message?.content || "No messages yet"}
                           </p>
                         </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/profile/${otherProfile.id}`);
+                          }}
+                        >
+                          <Eye className="w-4 h-4" />
+                        </Button>
                       </div>
                     </div>
                   );
