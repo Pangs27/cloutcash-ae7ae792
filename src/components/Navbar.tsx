@@ -64,7 +64,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onHomeClick, onContactClick, onA
             className="flex items-center space-x-2 transition-opacity hover:opacity-80"
           >
             <img src={logo} alt="CloutCash" className="h-8" />
-            <span className="font-bold text-xl">CloutCash</span>
+            <span className="font-bold text-xl bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">CloutCash</span>
           </Link>
 
           {/* Nav Links */}
