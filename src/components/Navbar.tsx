@@ -5,7 +5,13 @@ import { ThemeToggle } from "./ThemeToggle";
 import { useAuth } from "@/hooks/useAuth";
 import { useUnreadCount } from "@/hooks/useUnreadCount";
 import { toast } from "@/hooks/use-toast";
-import { LogOut, LayoutDashboard, Compass, MessageSquare, Briefcase } from "lucide-react";
+import { LogOut, LayoutDashboard, Compass, MessageSquare, Briefcase, Menu } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetTrigger,
+  SheetClose,
+} from "@/components/ui/sheet";
 import logo from "@/assets/cloutcash-logo.png";
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -148,21 +154,79 @@ export const Navbar: React.FC<NavbarProps> = ({ onHomeClick, onContactClick, onA
                 </Button>
               </div>
             ) : (
-              <div className="flex items-center space-x-2">
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => navigate("/login")}
-                >
-                  Login
-                </Button>
-                <Button 
-                  size="sm"
-                  onClick={() => navigate("/login?mode=signup")}
-                >
-                  Join Now
-                </Button>
-              </div>
+              <>
+                {/* Desktop buttons */}
+                <div className="hidden md:flex items-center space-x-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => navigate("/login")}
+                  >
+                    Login
+                  </Button>
+                  <Button 
+                    size="sm"
+                    onClick={() => navigate("/login?mode=signup")}
+                  >
+                    Join Now
+                  </Button>
+                </div>
+                
+                {/* Mobile hamburger menu */}
+                <Sheet>
+                  <SheetTrigger asChild className="md:hidden">
+                    <Button variant="ghost" size="icon">
+                      <Menu className="h-5 w-5" />
+                    </Button>
+                  </SheetTrigger>
+                  <SheetContent side="right" className="w-72 bg-background">
+                    <nav className="flex flex-col gap-4 mt-8">
+                      <SheetClose asChild>
+                        <span
+                          onClick={() => { onHomeClick(); }}
+                          className="text-lg font-medium transition-colors hover:text-primary cursor-pointer py-2"
+                        >
+                          Home
+                        </span>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <span
+                          onClick={() => { onAboutClick(); }}
+                          className="text-lg font-medium transition-colors hover:text-primary cursor-pointer py-2"
+                        >
+                          About
+                        </span>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <span
+                          onClick={() => { onContactClick(); }}
+                          className="text-lg font-medium transition-colors hover:text-primary cursor-pointer py-2"
+                        >
+                          Contact
+                        </span>
+                      </SheetClose>
+                      <div className="border-t border-border my-2" />
+                      <SheetClose asChild>
+                        <Button 
+                          variant="outline" 
+                          className="w-full justify-center"
+                          onClick={() => navigate("/login")}
+                        >
+                          Login
+                        </Button>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Button 
+                          className="w-full justify-center"
+                          onClick={() => navigate("/login?mode=signup")}
+                        >
+                          Join Now
+                        </Button>
+                      </SheetClose>
+                    </nav>
+                  </SheetContent>
+                </Sheet>
+              </>
             )}
           </div>
         </div>
