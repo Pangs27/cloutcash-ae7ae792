@@ -12,6 +12,7 @@ import {
   SheetTrigger,
   SheetClose,
 } from "@/components/ui/sheet";
+import { motion, AnimatePresence } from "framer-motion";
 import logo from "@/assets/cloutcash-logo.png";
 import React, { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -181,48 +182,65 @@ export const Navbar: React.FC<NavbarProps> = ({ onHomeClick, onContactClick, onA
                   </SheetTrigger>
                   <SheetContent side="right" className="w-72 bg-background">
                     <nav className="flex flex-col gap-4 mt-8">
-                      <SheetClose asChild>
-                        <span
-                          onClick={() => { onHomeClick(); }}
-                          className="text-lg font-medium transition-colors hover:text-primary cursor-pointer py-2"
+                      {[
+                        { label: "Home", onClick: onHomeClick },
+                        { label: "About", onClick: onAboutClick },
+                        { label: "Contact", onClick: onContactClick },
+                      ].map((item, index) => (
+                        <motion.div
+                          key={item.label}
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: index * 0.1, duration: 0.3, ease: "easeOut" }}
                         >
-                          Home
-                        </span>
-                      </SheetClose>
-                      <SheetClose asChild>
-                        <span
-                          onClick={() => { onAboutClick(); }}
-                          className="text-lg font-medium transition-colors hover:text-primary cursor-pointer py-2"
-                        >
-                          About
-                        </span>
-                      </SheetClose>
-                      <SheetClose asChild>
-                        <span
-                          onClick={() => { onContactClick(); }}
-                          className="text-lg font-medium transition-colors hover:text-primary cursor-pointer py-2"
-                        >
-                          Contact
-                        </span>
-                      </SheetClose>
-                      <div className="border-t border-border my-2" />
-                      <SheetClose asChild>
-                        <Button 
-                          variant="outline" 
-                          className="w-full justify-center"
-                          onClick={() => navigate("/login")}
-                        >
-                          Login
-                        </Button>
-                      </SheetClose>
-                      <SheetClose asChild>
-                        <Button 
-                          className="w-full justify-center"
-                          onClick={() => navigate("/login?mode=signup")}
-                        >
-                          Join Now
-                        </Button>
-                      </SheetClose>
+                          <SheetClose asChild>
+                            <span
+                              onClick={item.onClick}
+                              className="text-lg font-medium transition-colors hover:text-primary cursor-pointer py-2 block"
+                            >
+                              {item.label}
+                            </span>
+                          </SheetClose>
+                        </motion.div>
+                      ))}
+                      
+                      <motion.div 
+                        className="border-t border-border my-2"
+                        initial={{ opacity: 0, scaleX: 0 }}
+                        animate={{ opacity: 1, scaleX: 1 }}
+                        transition={{ delay: 0.3, duration: 0.3 }}
+                      />
+                      
+                      <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.4, duration: 0.3, ease: "easeOut" }}
+                      >
+                        <SheetClose asChild>
+                          <Button 
+                            variant="outline" 
+                            className="w-full justify-center"
+                            onClick={() => navigate("/login")}
+                          >
+                            Login
+                          </Button>
+                        </SheetClose>
+                      </motion.div>
+                      
+                      <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.5, duration: 0.3, ease: "easeOut" }}
+                      >
+                        <SheetClose asChild>
+                          <Button 
+                            className="w-full justify-center"
+                            onClick={() => navigate("/login?mode=signup")}
+                          >
+                            Join Now
+                          </Button>
+                        </SheetClose>
+                      </motion.div>
                     </nav>
                   </SheetContent>
                 </Sheet>
