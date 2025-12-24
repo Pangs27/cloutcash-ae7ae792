@@ -79,43 +79,75 @@ const HowItWorksPage = () => {
                   <motion.div
                     key={step.number}
                     layout
+                    layoutId={`card-${step.number}`}
                     onClick={() => handleCardClick(index)}
+                    initial={false}
+                    animate={{
+                      scale: isActive ? 1.02 : 1,
+                      y: isActive ? -2 : 0,
+                    }}
+                    whileHover={{ scale: isActive ? 1.02 : 1.01, y: -1 }}
+                    whileTap={{ scale: 0.98 }}
+                    transition={{
+                      type: "spring",
+                      stiffness: 400,
+                      damping: 30,
+                      mass: 0.8,
+                    }}
                     className={`
                       relative cursor-pointer rounded-3xl overflow-hidden
-                      transition-all duration-300 ease-out
                       ${isActive 
-                        ? 'bg-primary shadow-xl shadow-primary/20 scale-[1.02]' 
-                        : 'bg-card hover:bg-accent/5 shadow-lg hover:shadow-xl hover:scale-[1.01]'
+                        ? 'bg-primary shadow-2xl shadow-primary/25 ring-2 ring-primary/20' 
+                        : 'bg-card shadow-md hover:shadow-lg'
                       }
                     `}
-                    whileTap={{ scale: 0.98 }}
                   >
+                    {/* Subtle glow effect for active state */}
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-br from-primary/10 to-accent/10 pointer-events-none"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: isActive ? 1 : 0 }}
+                      transition={{ duration: 0.3 }}
+                    />
+
                     {/* Card Header - Always Visible */}
-                    <div className="p-6 md:p-8 flex items-center gap-4 md:gap-6">
-                      <div className={`
-                        flex-shrink-0 w-14 h-14 md:w-16 md:h-16 rounded-2xl flex items-center justify-center
-                        transition-colors duration-300
-                        ${isActive 
-                          ? 'bg-primary-foreground/20' 
-                          : 'bg-primary/10'
-                        }
-                      `}>
+                    <div className="relative p-5 md:p-7 flex items-center gap-4 md:gap-5">
+                      <motion.div
+                        animate={{
+                          scale: isActive ? 1.05 : 1,
+                          rotate: isActive ? 5 : 0,
+                        }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 500,
+                          damping: 25,
+                        }}
+                        className={`
+                          flex-shrink-0 w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center
+                          transition-colors duration-200
+                          ${isActive 
+                            ? 'bg-primary-foreground/20' 
+                            : 'bg-primary/10'
+                          }
+                        `}
+                      >
                         <Icon className={`
-                          w-6 h-6 md:w-7 md:h-7 transition-colors duration-300
+                          w-5 h-5 md:w-6 md:h-6 transition-colors duration-200
                           ${isActive ? 'text-primary-foreground' : 'text-primary'}
                         `} />
-                      </div>
+                      </motion.div>
                       
                       <div className="flex-1 min-w-0">
-                        <span className={`
-                          text-xs font-semibold uppercase tracking-wider mb-1 block
-                          transition-colors duration-300
-                          ${isActive ? 'text-primary-foreground/70' : 'text-muted-foreground'}
-                        `}>
+                        <motion.span
+                          className={`
+                            text-[10px] font-bold uppercase tracking-widest mb-0.5 block
+                            ${isActive ? 'text-primary-foreground/60' : 'text-muted-foreground/70'}
+                          `}
+                        >
                           Step {step.number}
-                        </span>
+                        </motion.span>
                         <h3 className={`
-                          text-xl md:text-2xl font-bold transition-colors duration-300
+                          text-lg md:text-xl font-bold transition-colors duration-200
                           ${isActive ? 'text-primary-foreground' : 'text-foreground'}
                         `}>
                           {step.title}
@@ -123,42 +155,81 @@ const HowItWorksPage = () => {
                       </div>
 
                       {/* Expand Indicator */}
-                      <div className={`
-                        flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center
-                        transition-all duration-300
-                        ${isActive 
-                          ? 'bg-primary-foreground/20 rotate-180' 
-                          : 'bg-muted'
-                        }
-                      `}>
+                      <motion.div
+                        animate={{ rotate: isActive ? 180 : 0 }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 300,
+                          damping: 20,
+                        }}
+                        className={`
+                          flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center
+                          ${isActive 
+                            ? 'bg-primary-foreground/15' 
+                            : 'bg-muted/80'
+                          }
+                        `}
+                      >
                         <svg 
-                          className={`w-4 h-4 transition-colors duration-300 ${isActive ? 'text-primary-foreground' : 'text-muted-foreground'}`}
+                          className={`w-4 h-4 ${isActive ? 'text-primary-foreground' : 'text-muted-foreground'}`}
                           fill="none" 
                           viewBox="0 0 24 24" 
                           stroke="currentColor"
                         >
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 9l-7 7-7-7" />
                         </svg>
-                      </div>
+                      </motion.div>
                     </div>
 
                     {/* Expandable Description */}
-                    <AnimatePresence>
+                    <AnimatePresence mode="wait">
                       {isActive && (
                         <motion.div
                           initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
+                          animate={{ 
+                            height: "auto", 
+                            opacity: 1,
+                            transition: {
+                              height: {
+                                type: "spring",
+                                stiffness: 500,
+                                damping: 40,
+                                mass: 0.8,
+                              },
+                              opacity: { duration: 0.2, delay: 0.1 }
+                            }
+                          }}
+                          exit={{ 
+                            height: 0, 
+                            opacity: 0,
+                            transition: {
+                              height: {
+                                type: "spring",
+                                stiffness: 500,
+                                damping: 40,
+                              },
+                              opacity: { duration: 0.15 }
+                            }
+                          }}
                           className="overflow-hidden"
                         >
-                          <div className="px-6 md:px-8 pb-6 md:pb-8 pt-0">
-                            <div className="pl-[4.5rem] md:pl-[5.5rem]">
-                              <p className="text-primary-foreground/90 text-base md:text-lg leading-relaxed">
+                          <motion.div 
+                            initial={{ y: -10 }}
+                            animate={{ y: 0 }}
+                            exit={{ y: -10 }}
+                            transition={{
+                              type: "spring",
+                              stiffness: 400,
+                              damping: 25,
+                            }}
+                            className="px-5 md:px-7 pb-5 md:pb-7 pt-0"
+                          >
+                            <div className="pl-16 md:pl-[4.75rem]">
+                              <p className="text-primary-foreground/85 text-sm md:text-base leading-relaxed">
                                 {step.description}
                               </p>
                             </div>
-                          </div>
+                          </motion.div>
                         </motion.div>
                       )}
                     </AnimatePresence>
