@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Plus, Briefcase, DollarSign, Clock, CheckCircle, XCircle, Calendar } from "lucide-react";
+import { Plus, Briefcase, DollarSign, Clock, CheckCircle, Calendar, FileText } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "@/hooks/use-toast";
@@ -114,7 +114,7 @@ export default function CampaignsPage() {
       <>
         <Navbar />
         <div className="min-h-screen bg-background pt-20 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-muted-foreground/40"></div>
         </div>
       </>
     );
@@ -126,24 +126,28 @@ export default function CampaignsPage() {
     <>
       <Navbar />
       <div className="min-h-screen bg-background pt-20 pb-16">
-        <div className="container mx-auto px-4 space-y-8">
-          {/* Header */}
-          <div className="flex justify-between items-center">
+        <div className="container mx-auto px-4 max-w-5xl space-y-6">
+          {/* Header - Calm & minimal */}
+          <div className="flex justify-between items-center py-4 border-b border-border/50">
             <div>
-              <h1 className="text-4xl font-bold flex items-center gap-3">
-                <Briefcase className="w-10 h-10 text-primary" />
+              <h1 className="text-2xl font-semibold text-foreground/90">
                 Campaigns
               </h1>
-              <p className="text-muted-foreground mt-2">
+              <p className="text-sm text-muted-foreground mt-1">
                 {isCreator 
-                  ? "Manage your campaign offers and active collaborations"
-                  : "Create and manage your brand campaigns"}
+                  ? "View and manage your collaborations"
+                  : "Organize and track your campaigns"}
               </p>
             </div>
             {!isCreator && (
-              <Button size="lg" className="gap-2" onClick={() => setCreateModalOpen(true)}>
-                <Plus className="w-5 h-5" />
-                Create Campaign
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="gap-2 text-muted-foreground hover:text-foreground border-border/60 hover:border-border hover:bg-muted/50" 
+                onClick={() => setCreateModalOpen(true)}
+              >
+                <Plus className="w-4 h-4" />
+                New Campaign
               </Button>
             )}
           </div>
@@ -151,195 +155,140 @@ export default function CampaignsPage() {
           {isCreator ? (
             // Creator View
             <Tabs defaultValue="offers" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="offers">Offers</TabsTrigger>
-                <TabsTrigger value="proposals">Proposals</TabsTrigger>
-                <TabsTrigger value="active">Active</TabsTrigger>
-                <TabsTrigger value="earnings">Earnings</TabsTrigger>
+              <TabsList className="bg-muted/30 border border-border/40 p-1 h-auto">
+                <TabsTrigger value="offers" className="text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm px-4 py-2">
+                  Offers
+                </TabsTrigger>
+                <TabsTrigger value="proposals" className="text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm px-4 py-2">
+                  Proposals
+                </TabsTrigger>
+                <TabsTrigger value="active" className="text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm px-4 py-2">
+                  Active
+                </TabsTrigger>
+                <TabsTrigger value="earnings" className="text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm px-4 py-2">
+                  Earnings
+                </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="offers" className="space-y-4 mt-6">
+              <TabsContent value="offers" className="space-y-3 mt-5">
                 {getCampaignsByStatus("proposed").length > 0 ? (
                   getCampaignsByStatus("proposed").map(campaign => (
                     <CampaignCard key={campaign.id} campaign={campaign} onClick={() => navigate(`/campaigns/${campaign.id}`)} />
                   ))
                 ) : (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Incoming Campaign Offers</CardTitle>
-                      <CardDescription>Review and respond to brand campaign offers</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-center py-12 text-muted-foreground">
-                        <Briefcase className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                        <p className="font-semibold mb-2">No pending offers</p>
-                        <p className="text-sm">When brands send you campaign offers, they'll appear here</p>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <EmptyState 
+                    title="No pending offers"
+                    description="New campaign offers from brands will appear here"
+                  />
                 )}
               </TabsContent>
 
-              <TabsContent value="proposals" className="space-y-4 mt-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Your Proposals</CardTitle>
-                    <CardDescription>Track proposals you've sent to brands</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-center py-12 text-muted-foreground">
-                      <p>No proposals sent yet</p>
-                    </div>
-                  </CardContent>
-                </Card>
+              <TabsContent value="proposals" className="space-y-3 mt-5">
+                <EmptyState 
+                  title="No proposals yet"
+                  description="Proposals you send to brands will be tracked here"
+                />
               </TabsContent>
 
-              <TabsContent value="active" className="space-y-4 mt-6">
+              <TabsContent value="active" className="space-y-3 mt-5">
                 {getCampaignsByStatus(["accepted", "active"]).length > 0 ? (
                   getCampaignsByStatus(["accepted", "active"]).map(campaign => (
                     <CampaignCard key={campaign.id} campaign={campaign} onClick={() => navigate(`/campaigns/${campaign.id}`)} />
                   ))
                 ) : (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Active Campaigns</CardTitle>
-                      <CardDescription>Your ongoing brand collaborations</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-center py-12 text-muted-foreground">
-                        <CheckCircle className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                        <p className="font-semibold mb-2">No active campaigns</p>
-                        <p className="text-sm">Accept campaign offers to start collaborating with brands</p>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <EmptyState 
+                    title="No active campaigns"
+                    description="Ongoing collaborations will appear here"
+                  />
                 )}
               </TabsContent>
 
-              <TabsContent value="earnings" className="space-y-4 mt-6">
-                <div className="grid md:grid-cols-3 gap-4">
-                  <Card>
-                    <CardContent className="pt-6 text-center">
-                      <DollarSign className="w-8 h-8 mx-auto mb-2 text-primary" />
-                      <p className="text-3xl font-bold">$0</p>
-                      <p className="text-sm text-muted-foreground">Total Earned</p>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardContent className="pt-6 text-center">
-                      <CheckCircle className="w-8 h-8 mx-auto mb-2 text-primary" />
-                      <p className="text-3xl font-bold">0</p>
-                      <p className="text-sm text-muted-foreground">Completed</p>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardContent className="pt-6 text-center">
-                      <Clock className="w-8 h-8 mx-auto mb-2 text-primary" />
-                      <p className="text-3xl font-bold">$0</p>
-                      <p className="text-sm text-muted-foreground">Pending</p>
-                    </CardContent>
-                  </Card>
+              <TabsContent value="earnings" className="space-y-4 mt-5">
+                <div className="grid grid-cols-3 gap-3">
+                  <StatCard label="Total Earned" value="$0" />
+                  <StatCard label="Completed" value="0" />
+                  <StatCard label="Pending" value="$0" />
                 </div>
               </TabsContent>
             </Tabs>
           ) : (
             // Brand View
             <Tabs defaultValue="draft" className="w-full">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="draft">Draft</TabsTrigger>
-                <TabsTrigger value="negotiation">Negotiation</TabsTrigger>
-                <TabsTrigger value="active">Active</TabsTrigger>
-                <TabsTrigger value="completed">Completed</TabsTrigger>
+              <TabsList className="bg-muted/30 border border-border/40 p-1 h-auto">
+                <TabsTrigger value="draft" className="text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm px-4 py-2">
+                  Draft
+                </TabsTrigger>
+                <TabsTrigger value="negotiation" className="text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm px-4 py-2">
+                  Negotiation
+                </TabsTrigger>
+                <TabsTrigger value="active" className="text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm px-4 py-2">
+                  Active
+                </TabsTrigger>
+                <TabsTrigger value="completed" className="text-sm data-[state=active]:bg-background data-[state=active]:shadow-sm px-4 py-2">
+                  Completed
+                </TabsTrigger>
               </TabsList>
 
-              <TabsContent value="draft" className="space-y-4 mt-6">
-                <div className="flex justify-end mb-4">
-                  <Button className="gap-2" onClick={() => setCreateModalOpen(true)}>
-                    <Plus className="w-4 h-4" />
-                    New Campaign
-                  </Button>
-                </div>
+              <TabsContent value="draft" className="space-y-3 mt-5">
                 {getCampaignsByStatus("proposed").length > 0 ? (
                   getCampaignsByStatus("proposed").map(campaign => (
                     <CampaignCard key={campaign.id} campaign={campaign} onClick={() => navigate(`/campaigns/${campaign.id}`)} />
                   ))
                 ) : (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Draft Campaigns</CardTitle>
-                      <CardDescription>Campaigns you're still working on</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-center py-12 text-muted-foreground">
-                        <Briefcase className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                        <p className="font-semibold mb-2">No draft campaigns</p>
-                        <p className="text-sm">Create your first campaign to start finding creators</p>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <EmptyState 
+                    title="No draft campaigns"
+                    description="Start a new campaign to begin"
+                    action={
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="mt-3 gap-2 text-muted-foreground hover:text-foreground"
+                        onClick={() => setCreateModalOpen(true)}
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        Create Campaign
+                      </Button>
+                    }
+                  />
                 )}
               </TabsContent>
 
-              <TabsContent value="negotiation" className="space-y-4 mt-6">
+              <TabsContent value="negotiation" className="space-y-3 mt-5">
                 {getCampaignsByStatus("proposed").length > 0 ? (
                   getCampaignsByStatus("proposed").map(campaign => (
                     <CampaignCard key={campaign.id} campaign={campaign} onClick={() => navigate(`/campaigns/${campaign.id}`)} />
                   ))
                 ) : (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>In Negotiation</CardTitle>
-                      <CardDescription>Campaigns being discussed with creators</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-center py-12 text-muted-foreground">
-                        <Clock className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                        <p>No campaigns in negotiation</p>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <EmptyState 
+                    title="No campaigns in negotiation"
+                    description="Active discussions with creators will appear here"
+                  />
                 )}
               </TabsContent>
 
-              <TabsContent value="active" className="space-y-4 mt-6">
+              <TabsContent value="active" className="space-y-3 mt-5">
                 {getCampaignsByStatus(["accepted", "active"]).length > 0 ? (
                   getCampaignsByStatus(["accepted", "active"]).map(campaign => (
                     <CampaignCard key={campaign.id} campaign={campaign} onClick={() => navigate(`/campaigns/${campaign.id}`)} />
                   ))
                 ) : (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Active Campaigns</CardTitle>
-                      <CardDescription>Currently running campaigns with creators</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-center py-12 text-muted-foreground">
-                        <CheckCircle className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                        <p className="font-semibold mb-2">No active campaigns</p>
-                        <p className="text-sm">Launch campaigns to start collaborating with creators</p>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <EmptyState 
+                    title="No active campaigns"
+                    description="Running campaigns will be tracked here"
+                  />
                 )}
               </TabsContent>
 
-              <TabsContent value="completed" className="space-y-4 mt-6">
+              <TabsContent value="completed" className="space-y-3 mt-5">
                 {getCampaignsByStatus("completed").length > 0 ? (
                   getCampaignsByStatus("completed").map(campaign => (
                     <CampaignCard key={campaign.id} campaign={campaign} onClick={() => navigate(`/campaigns/${campaign.id}`)} />
                   ))
                 ) : (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Completed Campaigns</CardTitle>
-                      <CardDescription>Successfully finished campaigns</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-center py-12 text-muted-foreground">
-                        <p>No completed campaigns yet</p>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <EmptyState 
+                    title="No completed campaigns"
+                    description="Finished campaigns will appear here"
+                  />
                 )}
               </TabsContent>
             </Tabs>
@@ -360,39 +309,74 @@ export default function CampaignsPage() {
   );
 }
 
-// Campaign Card Component
+// Empty State Component - Calm, minimal design
+const EmptyState = ({ 
+  title, 
+  description, 
+  action 
+}: { 
+  title: string; 
+  description: string; 
+  action?: React.ReactNode;
+}) => (
+  <div className="flex flex-col items-center justify-center py-16 px-4">
+    <div className="w-10 h-10 rounded-full bg-muted/50 flex items-center justify-center mb-4">
+      <FileText className="w-5 h-5 text-muted-foreground/60" />
+    </div>
+    <p className="text-sm font-medium text-foreground/70 mb-1">{title}</p>
+    <p className="text-xs text-muted-foreground text-center max-w-xs">{description}</p>
+    {action}
+  </div>
+);
+
+// Stat Card Component - Subtle, refined
+const StatCard = ({ label, value }: { label: string; value: string }) => (
+  <div className="bg-muted/20 border border-border/30 rounded-lg p-4 text-center">
+    <p className="text-2xl font-semibold text-foreground/80">{value}</p>
+    <p className="text-xs text-muted-foreground mt-1">{label}</p>
+  </div>
+);
+
+// Campaign Card Component - Premium, quiet design
 const CampaignCard = ({ campaign, onClick }: { campaign: Campaign; onClick: () => void }) => (
-  <Card className="cursor-pointer hover:shadow-lg transition-shadow" onClick={onClick}>
-    <CardContent className="pt-6">
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex-1">
-          <h3 className="text-lg font-semibold mb-2">{campaign.title}</h3>
-          <div className="flex items-center gap-2 mb-3">
-            <Badge variant={campaign.status === "completed" ? "outline" : "default"}>
-              {campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1)}
-            </Badge>
-          </div>
+  <div 
+    className="group bg-card border border-border/40 rounded-lg p-4 cursor-pointer transition-all duration-200 hover:border-border/70 hover:bg-muted/20"
+    onClick={onClick}
+  >
+    <div className="flex items-start justify-between gap-4">
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-3 mb-2">
+          <h3 className="text-sm font-medium text-foreground/90 truncate">{campaign.title}</h3>
+          <Badge 
+            variant="outline" 
+            className="text-[10px] px-2 py-0.5 font-normal text-muted-foreground border-border/50 bg-muted/30"
+          >
+            {campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1)}
+          </Badge>
         </div>
-        {campaign.brand_profile && (
-          <Avatar className="w-10 h-10">
-            <AvatarImage src={campaign.brand_profile.avatar_url || ""} />
-            <AvatarFallback>{campaign.brand_profile.full_name[0]}</AvatarFallback>
-          </Avatar>
-        )}
+        
+        <p className="text-xs text-muted-foreground line-clamp-1 mb-3">{campaign.deliverables}</p>
+        
+        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+          <span className="flex items-center gap-1.5">
+            <DollarSign className="w-3.5 h-3.5" />
+            ₹{campaign.budget.toLocaleString()}
+          </span>
+          <span className="flex items-center gap-1.5">
+            <Calendar className="w-3.5 h-3.5" />
+            {format(new Date(campaign.start_date), "MMM d")}
+          </span>
+        </div>
       </div>
-
-      <div className="grid grid-cols-2 gap-4 text-sm">
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <DollarSign className="w-4 h-4" />
-          <span>₹{campaign.budget.toLocaleString()}</span>
-        </div>
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Calendar className="w-4 h-4" />
-          <span>{format(new Date(campaign.start_date), "MMM d")}</span>
-        </div>
-      </div>
-
-      <p className="text-sm text-muted-foreground mt-3 line-clamp-2">{campaign.deliverables}</p>
-    </CardContent>
-  </Card>
+      
+      {campaign.brand_profile && (
+        <Avatar className="w-8 h-8 border border-border/30">
+          <AvatarImage src={campaign.brand_profile.avatar_url || ""} />
+          <AvatarFallback className="text-xs bg-muted/50 text-muted-foreground">
+            {campaign.brand_profile.full_name[0]}
+          </AvatarFallback>
+        </Avatar>
+      )}
+    </div>
+  </div>
 );
