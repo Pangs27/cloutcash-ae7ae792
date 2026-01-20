@@ -337,46 +337,81 @@ const StatCard = ({ label, value }: { label: string; value: string }) => (
   </div>
 );
 
-// Campaign Card Component - Premium, quiet design
-const CampaignCard = ({ campaign, onClick }: { campaign: Campaign; onClick: () => void }) => (
-  <div 
-    className="group bg-card border border-border/40 rounded-lg p-4 cursor-pointer transition-all duration-200 hover:border-border/70 hover:bg-muted/20"
-    onClick={onClick}
-  >
-    <div className="flex items-start justify-between gap-4">
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-3 mb-2">
-          <h3 className="text-sm font-medium text-foreground/90 truncate">{campaign.title}</h3>
-          <Badge 
-            variant="outline" 
-            className="text-[10px] px-2 py-0.5 font-normal text-muted-foreground border-border/50 bg-muted/30"
-          >
-            {campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1)}
-          </Badge>
+// Campaign Card Component - Contra-inspired minimal work card
+const CampaignCard = ({ campaign, onClick }: { campaign: Campaign; onClick: () => void }) => {
+  const statusStyles: Record<string, string> = {
+    proposed: "bg-amber-500/10 text-amber-600 dark:text-amber-400",
+    accepted: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+    active: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+    completed: "bg-muted text-muted-foreground",
+  };
+
+  return (
+    <div 
+      className="group relative bg-background border border-border/50 rounded-xl p-5 cursor-pointer transition-colors duration-150 hover:border-border"
+      onClick={onClick}
+    >
+      {/* Top row: Avatar + Title + Status */}
+      <div className="flex items-start gap-3.5">
+        {campaign.brand_profile && (
+          <Avatar className="w-10 h-10 rounded-lg border border-border/40 shrink-0">
+            <AvatarImage src={campaign.brand_profile.avatar_url || ""} className="rounded-lg" />
+            <AvatarFallback className="rounded-lg text-xs font-medium bg-muted/60 text-muted-foreground">
+              {campaign.brand_profile.full_name.slice(0, 2).toUpperCase()}
+            </AvatarFallback>
+          </Avatar>
+        )}
+        
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <h3 className="text-[15px] font-medium text-foreground leading-tight truncate">
+                {campaign.title}
+              </h3>
+              {campaign.brand_profile && (
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {campaign.brand_profile.full_name}
+                </p>
+              )}
+            </div>
+            
+            <span 
+              className={`shrink-0 text-[11px] font-medium px-2 py-1 rounded-md ${statusStyles[campaign.status] || statusStyles.proposed}`}
+            >
+              {campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1)}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Deliverables preview */}
+      <p className="text-sm text-muted-foreground mt-3 line-clamp-2 leading-relaxed">
+        {campaign.deliverables}
+      </p>
+
+      {/* Bottom metadata row */}
+      <div className="flex items-center gap-5 mt-4 pt-4 border-t border-border/40">
+        <div className="flex items-center gap-1.5">
+          <span className="text-xs text-muted-foreground/70">Budget</span>
+          <span className="text-sm font-medium text-foreground">₹{campaign.budget.toLocaleString()}</span>
         </div>
         
-        <p className="text-xs text-muted-foreground line-clamp-1 mb-3">{campaign.deliverables}</p>
+        <div className="w-px h-3 bg-border/60" />
         
-        <div className="flex items-center gap-4 text-xs text-muted-foreground">
-          <span className="flex items-center gap-1.5">
-            <DollarSign className="w-3.5 h-3.5" />
-            ₹{campaign.budget.toLocaleString()}
-          </span>
-          <span className="flex items-center gap-1.5">
-            <Calendar className="w-3.5 h-3.5" />
-            {format(new Date(campaign.start_date), "MMM d")}
+        <div className="flex items-center gap-1.5">
+          <span className="text-xs text-muted-foreground/70">Timeline</span>
+          <span className="text-sm text-foreground">
+            {format(new Date(campaign.start_date), "MMM d")} — {format(new Date(campaign.end_date), "MMM d")}
           </span>
         </div>
       </div>
-      
-      {campaign.brand_profile && (
-        <Avatar className="w-8 h-8 border border-border/30">
-          <AvatarImage src={campaign.brand_profile.avatar_url || ""} />
-          <AvatarFallback className="text-xs bg-muted/50 text-muted-foreground">
-            {campaign.brand_profile.full_name[0]}
-          </AvatarFallback>
-        </Avatar>
-      )}
+
+      {/* Subtle hover indicator */}
+      <div className="absolute right-4 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <svg className="w-4 h-4 text-muted-foreground/50" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+      </div>
     </div>
-  </div>
-);
+  );
+};
