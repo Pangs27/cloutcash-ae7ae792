@@ -102,10 +102,10 @@ export function useDiscoverProfiles() {
   }, [fetchProfiles, filters]);
 
   useEffect(() => {
-    if (user) {
+    if (user && currentUserType) {
       fetchProfiles(filters);
     }
-  }, [user]);
+  }, [user, currentUserType]);
 
   return {
     profiles,
