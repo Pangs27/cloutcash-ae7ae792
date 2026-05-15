@@ -5,7 +5,7 @@ import { ThemeToggle } from "./ThemeToggle";
 import { useAuth } from "@/hooks/useAuth";
 import { useUnreadCount } from "@/hooks/useUnreadCount";
 import { toast } from "@/hooks/use-toast";
-import { LogOut, LayoutDashboard, Compass, MessageSquare, Briefcase, Menu, User } from "lucide-react";
+import { LogOut, LayoutDashboard, Compass, Briefcase, Menu, User, BrainCircuit } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -73,6 +73,7 @@ export const Navbar: React.FC = () => {
 // },
 
     { label: "Campaigns", path: "/campaigns", icon: Briefcase },
+    { label: "Creator Intelligence", path: "/creator-intelligence", icon: BrainCircuit },
     { label: "Profile", path: "/profile", icon: User },
   ];
 
@@ -109,7 +110,7 @@ export const Navbar: React.FC = () => {
           {/* Auth Nav Links - Desktop only */}
           {user && (
             <div className="hidden lg:flex items-center space-x-1">
-              {authNavItems.slice(0, 3).map((item) => (
+              {authNavItems.slice(0, 4).map((item) => (
                 <Button
                   key={item.path}
                   variant={location.pathname === item.path ? "secondary" : "ghost"}

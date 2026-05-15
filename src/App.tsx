@@ -16,6 +16,7 @@ import DiscoverPage from "./pages/DiscoverPage";
 import MessagesPage from "./pages/MessagesPage";
 import CampaignsPage from "./pages/CampaignsPage";
 import CampaignDetailPage from "./pages/CampaignDetailPage";
+import CreatorIntelligencePage from "./pages/CreatorIntelligencePage";
 import CreatorsPage from "./pages/CreatorsPage";
 import BrandsPage from "./pages/BrandsPage";
 import HowItWorksPage from "./pages/HowItWorksPage";
@@ -116,6 +117,14 @@ const App = () => (
                 <CampaignsPage />
               </ProtectedRoute>
             } 
+          />
+          <Route
+            path="/creator-intelligence"
+            element={
+              <ProtectedRoute>
+                <CreatorIntelligencePage />
+              </ProtectedRoute>
+            }
           />
           <Route 
             path="/campaigns/:id" 
